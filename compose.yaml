@@ -1,0 +1,25 @@
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    environment:
+      KASSA_DB: /data/kassa.sqlite3
+    volumes:
+      - kassa_data:/data
+    ports:
+      - '127.0.0.1:8000:8000'
+  bot:
+    build: .
+    restart: unless-stopped
+    command: ["python", "bot.py"]
+    environment:
+      KASSA_DB: /data/kassa.sqlite3
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:?Set TELEGRAM_BOT_TOKEN in .env}
+      TELEGRAM_ALLOWED_IDS: ${TELEGRAM_ALLOWED_IDS:?Set TELEGRAM_ALLOWED_IDS in .env}
+      KASSA_BOT_COMPANY_ID: '1'
+    volumes:
+      - kassa_data:/data:ro
+    depends_on:
+      - web
+volumes:
+  kassa_data:
